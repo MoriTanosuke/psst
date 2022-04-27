@@ -13,8 +13,8 @@ use crate::{
     cmd,
     data::{
         Album, ArtistTracks, CommonCtx, FindQuery, MatchFindQuery, Playable, PlaybackOrigin,
-        PlaybackPayload, PlaylistTracks, Recommendations, SavedTracks, SearchResults, ShowEpisodes,
-        WithCtx,
+        PlaybackPayload, PlaylistTracks, Recommendations, SavedTracks, RecentlyPlayedTracks, SearchResults,
+        ShowEpisodes, WithCtx,
     },
     ui::theme,
 };
@@ -183,6 +183,22 @@ impl PlayableIter for ArtistTracks {
 }
 
 impl PlayableIter for SavedTracks {
+    fn origin(&self) -> PlaybackOrigin {
+        PlaybackOrigin::Library
+    }
+
+    fn for_each(&self, mut cb: impl FnMut(Playable, usize)) {
+        for (position, track) in self.tracks.iter().enumerate() {
+            cb(Playable::Track(track.to_owned()), position);
+        }
+    }
+
+    fn count(&self) -> usize {
+        self.tracks.len()
+    }
+}
+
+impl PlayableIter for RecentlyPlayedTracks {
     fn origin(&self) -> PlaybackOrigin {
         PlaybackOrigin::Library
     }

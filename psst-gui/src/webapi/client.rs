@@ -418,6 +418,27 @@ impl WebApi {
             .collect())
     }
 
+    // https://developer.spotify.com/documentation/web-api/reference/#/operations/get-recently-played
+    pub fn get_recently_played_tracks(&self) -> Result<Vector<Arc<Track>>, Error> {
+        #[derive(Clone, Deserialize)]
+        struct List {
+            items: Vector<HistoryItem>,
+            limit: usize,
+        }
+        #[derive(Clone, Deserialize)]
+        struct HistoryItem {
+            track: Arc<Track>
+        }
+
+        let request = self.get("v1/me/player/recently-played")?
+            .query("market", "from_token");
+        let result: List = self.load(request)?;
+        Ok(result.items
+            .into_iter()
+            .map(|item: HistoryItem| item.track)
+            .collect())
+    }
+
     // https://developer.spotify.com/documentation/web-api/reference/#/operations/get-users-saved-shows
     pub fn get_saved_shows(&self) -> Result<Vector<Arc<Show>>, Error> {
         #[derive(Clone, Deserialize)]

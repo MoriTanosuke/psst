@@ -5,8 +5,8 @@ use druid::{widget::List, LensExt, Selector, Widget, WidgetExt};
 use crate::{
     cmd,
     data::{
-        Album, AlbumLink, AppState, Ctx, Library, SavedAlbums, SavedShows, SavedTracks, Show,
-        ShowLink, Track, TrackId,
+        Album, AlbumLink, AppState, Ctx, Library, SavedAlbums, SavedShows, SavedTracks,
+        RecentlyPlayedTracks, Show, ShowLink, Track, TrackId,
     },
     webapi::WebApi,
     widget::{Async, MyWidgetExt},
@@ -15,6 +15,7 @@ use crate::{
 use super::{album, playable, show, track, utils};
 
 pub const LOAD_TRACKS: Selector = Selector::new("app.library.load-tracks");
+pub const LOAD_RECENTLY_PLAYED_TRACKS: Selector = Selector::new("app.library.load-recently-played-tracks");
 pub const LOAD_ALBUMS: Selector = Selector::new("app.library.load-albums");
 pub const LOAD_SHOWS: Selector = Selector::new("app.library.load-shows");
 
@@ -63,6 +64,79 @@ pub fn saved_tracks_widget() -> impl Widget<AppState> {
         |_, data, r| {
             data.with_library_mut(|library| {
                 library.saved_tracks.update(r);
+            });
+        },
+    )
+    .on_command_async(
+        SAVE_TRACK,
+        |t| WebApi::global().save_track(&t.id.0.to_base62()),
+        |_, data, t| {
+            data.with_library_mut(|library| {
+                library.add_track(t);
+            });
+        },
+        |_, data, (_, r)| {
+            if let Err(err) = r {
+                data.error_alert(err);
+            } else {
+                data.info_alert("Track added to library.")
+            }
+        },
+    )
+    .on_command_async(
+        UNSAVE_TRACK,
+        |i| WebApi::global().unsave_track(&i.0.to_base62()),
+        |_, data, i| {
+            data.with_library_mut(|library| {
+                library.remove_track(&i);
+            });
+        },
+        |_, data, (_, r)| {
+            if let Err(err) = r {
+                data.error_alert(err);
+            } else {
+                data.info_alert("Track removed from library.")
+            }
+        },
+    )
+}
+
+pub fn recently_played_tracks_widget() -> impl Widget<AppState> {
+    Async::new(
+        utils::spinner_widget,
+        || {
+            playable::list_widget_with_find(
+                playable::Display {
+                    track: track::Display {
+                        title: true,
+                        artist: true,
+                        album: true,
+                        ..track::Display::empty()
+                    },
+                },
+                cmd::FIND_IN_RECENTLY_PLAYED_TRACKS,
+            )
+        },
+        utils::error_widget,
+    )
+    .lens(
+        Ctx::make(
+            AppState::common_ctx,
+            AppState::library.then(Library::recently_played_tracks.in_arc()),
+        )
+        .then(Ctx::in_promise()),
+    )
+    .on_command_async(
+        LOAD_RECENTLY_PLAYED_TRACKS,
+        |_| WebApi::global().get_recently_played_tracks().map(RecentlyPlayedTracks::new),
+        |_, data, _| {
+            data.with_library_mut(|library| {
+                library.recently_played_tracks.defer_default();
+            });
+        },
+        |_, data, r| {
+            data.with_library_mut(|library| {
+                library.recently_played_tracks.update(r);
             });
         },
     )

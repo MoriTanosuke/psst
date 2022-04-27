@@ -12,6 +12,7 @@ use super::RecommendationsRequest;
 pub enum Route {
     Home,
     SavedTracks,
+    RecentlyPlayedTracks,
     SavedAlbums,
     SavedShows,
     SearchResults,
@@ -26,6 +27,7 @@ pub enum Route {
 pub enum Nav {
     Home,
     SavedTracks,
+    RecentlyPlayedTracks,
     SavedAlbums,
     SavedShows,
     SearchResults(Arc<str>),
@@ -41,6 +43,7 @@ impl Nav {
         match self {
             Nav::Home => Route::Home,
             Nav::SavedTracks => Route::SavedTracks,
+            Nav::RecentlyPlayedTracks => Route::RecentlyPlayedTracks,
             Nav::SavedAlbums => Route::SavedAlbums,
             Nav::SavedShows => Route::SavedShows,
             Nav::SearchResults(_) => Route::SearchResults,
@@ -56,6 +59,7 @@ impl Nav {
         match self {
             Nav::Home => "Home".to_string(),
             Nav::SavedTracks => "Saved Tracks".to_string(),
+            Nav::RecentlyPlayedTracks => "Recently Played".to_string(),
             Nav::SavedAlbums => "Saved Albums".to_string(),
             Nav::SavedShows => "Saved Podcasts".to_string(),
             Nav::SearchResults(query) => query.to_string(),
@@ -71,6 +75,7 @@ impl Nav {
         match self {
             Nav::Home => "Home".to_string(),
             Nav::SavedTracks => "Saved Tracks".to_string(),
+            Nav::RecentlyPlayedTracks => "Recently Played".to_string(),
             Nav::SavedAlbums => "Saved Albums".to_string(),
             Nav::SavedShows => "Saved Shows".to_string(),
             Nav::SearchResults(query) => format!("Search “{}”", query),

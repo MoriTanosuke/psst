@@ -84,6 +84,7 @@ impl AppState {
             user_profile: Promise::Empty,
             saved_albums: Promise::Empty,
             saved_tracks: Promise::Empty,
+            recently_played_tracks: Promise::Empty,
             saved_shows: Promise::Empty,
             playlists: Promise::Empty,
         });
@@ -277,6 +278,7 @@ pub struct Library {
     pub playlists: Promise<Vector<Playlist>>,
     pub saved_albums: Promise<SavedAlbums>,
     pub saved_tracks: Promise<SavedTracks>,
+    pub recently_played_tracks: Promise<RecentlyPlayedTracks>,
     pub saved_shows: Promise<SavedShows>,
 }
 
@@ -382,6 +384,19 @@ pub struct SavedTracks {
 }
 
 impl SavedTracks {
+    pub fn new(tracks: Vector<Arc<Track>>) -> Self {
+        let set = tracks.iter().map(|t| t.id).collect();
+        Self { tracks, set }
+    }
+}
+
+#[derive(Clone, Default, Data, Lens)]
+pub struct RecentlyPlayedTracks {
+    pub tracks: Vector<Arc<Track>>,
+    pub set: HashSet<TrackId>,
+}
+
+impl RecentlyPlayedTracks {
     pub fn new(tracks: Vector<Arc<Track>>) -> Self {
         let set = tracks.iter().map(|t| t.id).collect();
         Self { tracks, set }

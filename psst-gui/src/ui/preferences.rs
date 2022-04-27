@@ -156,6 +156,14 @@ fn general_tab_widget() -> impl Widget<AppState> {
 
     col = col.with_spacer(theme::grid(3.0));
 
+    // Track history
+    col = col.with_child(
+        Checkbox::new("Report played tracks to Spotify")
+            .lens(AppState::config.then(Config::report_tracks)),
+    );
+
+    col = col.with_spacer(theme::grid(3.0));
+
     // Audio quality
     col = col
         .with_child(Label::new("Audio quality").with_font(theme::UI_FONT_MEDIUM))

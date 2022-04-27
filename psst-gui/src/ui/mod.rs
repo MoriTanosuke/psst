@@ -50,7 +50,7 @@ pub fn main_window() -> WindowDesc<AppState> {
 }
 
 pub fn preferences_window() -> WindowDesc<AppState> {
-    let win_size = (theme::grid(50.0), theme::grid(45.0));
+    let win_size = (theme::grid(50.0), theme::grid(55.0));
 
     // On Windows, the window size includes the titlebar.
     let win_size = if cfg!(target_os = "windows") {
@@ -210,6 +210,17 @@ fn route_widget() -> impl Widget<AppState> {
                     1.0,
                 )
                 .boxed(),
+            Route::RecentlyPlayedTracks => Flex::column()
+                .with_child(
+                    find::finder_widget(cmd::FIND_IN_RECENTLY_PLAYED_TRACKS, "Find in recently played tracks...")
+                        .lens(AppState::finder),
+                )
+                .with_flex_child(
+                    Scroll::new(library::recently_played_tracks_widget().padding(theme::grid(1.0)))
+                        .vertical(),
+                    1.0,
+                )
+                .boxed(),
             Route::SavedAlbums => {
                 Scroll::new(library::saved_albums_widget().padding(theme::grid(1.0)))
                     .vertical()
@@ -266,6 +277,7 @@ fn sidebar_menu_widget() -> impl Widget<AppState> {
         .with_default_spacer()
         .with_child(sidebar_link_widget("Home", Nav::Home))
         .with_child(sidebar_link_widget("Tracks", Nav::SavedTracks))
+        .with_child(sidebar_link_widget("Recently Played", Nav::RecentlyPlayedTracks))
         .with_child(sidebar_link_widget("Albums", Nav::SavedAlbums))
         .with_child(sidebar_link_widget("Podcasts", Nav::SavedShows))
         .with_child(search::input_widget().padding((theme::grid(1.0), theme::grid(1.0))))
@@ -387,6 +399,7 @@ fn route_icon_widget() -> impl Widget<Nav> {
             match &nav {
                 Nav::Home => Empty.boxed(),
                 Nav::SavedTracks => Empty.boxed(),
+                Nav::RecentlyPlayedTracks => Empty.boxed(),
                 Nav::SavedAlbums => Empty.boxed(),
                 Nav::SavedShows => Empty.boxed(),
                 Nav::SearchResults(_) => icon(&icons::SEARCH).boxed(),

@@ -17,6 +17,11 @@ impl NavController {
                     ctx.submit_command(library::LOAD_TRACKS);
                 }
             }
+            Nav::RecentlyPlayedTracks => {
+                if !data.library.recently_played_tracks.is_resolved() {
+                    ctx.submit_command(library::LOAD_RECENTLY_PLAYED_TRACKS);
+                }
+            }
             Nav::SavedAlbums => {
                 if !data.library.saved_albums.is_resolved() {
                     ctx.submit_command(library::LOAD_ALBUMS);

@@ -57,17 +57,24 @@ fn view_menu() -> Menu<AppState> {
         )
         .entry(
             MenuItem::new(
+                LocalizedString::new("menu-item-recently-played-tracks").with_placeholder("Recently Played"),
+            )
+            .command(cmd::NAVIGATE.with(Nav::RecentlyPlayedTracks))
+            .hotkey(SysMods::Cmd, "3"),
+        )
+        .entry(
+            MenuItem::new(
                 LocalizedString::new("menu-item-saved-albums").with_placeholder("Saved Albums"),
             )
             .command(cmd::NAVIGATE.with(Nav::SavedAlbums))
-            .hotkey(SysMods::Cmd, "3"),
+            .hotkey(SysMods::Cmd, "4"),
         )
         .entry(
             MenuItem::new(
                 LocalizedString::new("menu-item-saved-shows").with_placeholder("Saved Shows"),
             )
             .command(cmd::NAVIGATE.with(Nav::SavedShows))
-            .hotkey(SysMods::Cmd, "4"),
+            .hotkey(SysMods::Cmd, "5"),
         )
         .entry(
             MenuItem::new(LocalizedString::new("menu-item-search").with_placeholder("Search..."))
